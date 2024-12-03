@@ -2,28 +2,58 @@ const mongoose = require('mongoose');
 
 // Define the schema for the Coin model
 const coinSchema = new mongoose.Schema({
+    id: {
+        type: String,
+        required: true,
+        unique: true,  // Assuming the "id" is unique for each cryptocurrency
+    },
+    name: {
+        type: String,
+        required: true,
+    },
     logo: {
         type: String,
-        required: true, // The logo image URL
+        required: true,
     },
     symbol: {
         type: String,
         required: true,
-        unique: true,  // Ensures that the symbol is unique across the collection
-        trim: true,  // Removes unnecessary whitespace
     },
-    price_usd: {
+    rank: {
         type: Number,
-        required: true,  // The price in USD
+        required: true,
     },
-    price_btc: {
-        type: Number,
-        required: true,  // The price in BTC
+    is_new: {
+        type: Boolean,
+        default: false,  // Default to false if not specified
     },
-    ohlc_history: [
+    is_active: {
+        type: Boolean,
+        default: true,   // Default to true if not specified
+    },
+    type: {
+        type: String,
+        enum: ["coin", "token"], // You can adjust this enum based on expected values
+        required: true,
+    },
+    ticker_history: [
         {
-            type: [String],  // Array of numbers, each representing [open, high, low, close]
-            required: false,  // You can choose whether it's required or optional
+            timestamp: {
+                type: String,
+                required: true,
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+            volume_24h: {
+                type: Number,
+                required: true,
+            },
+            market_cap: {
+                type: Number,
+                required: true,
+            },
         },
     ],
     createdAt: {

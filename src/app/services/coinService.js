@@ -30,10 +30,22 @@ const getCoinsData = async () => {
 
 const insertCoins = async (coins) => {
   try {
+    // Drop the collection before inserting new data
+    await Coin.collection.drop();
+    console.log('Collection dropped successfully');
+
+    // Insert new coins
     await Coin.insertMany(coins);
     console.log('Coins inserted successfully');
   } catch (error) {
-    throw new Error('Error inserting coins into DB: ' + error.message);
+    if (error.message === 'ns not found') {
+      // This error means the collection does not exist yet, which is okay
+      console.log('Collection does not exist, creating new collection.');
+      await Coin.insertMany(coins);
+      console.log('Coins inserted successfully');
+    } else {
+      throw new Error('Error inserting coins into DB: ' + error.message);
+    }
   }
 };
 
