@@ -39,4 +39,8 @@ userSchema.pre('save', async function (next) {
 });
 
 // Add a method to verify passwords
-userSchema.methods.isPassw
+userSchema.methods.isPasswordMatch = async function (plainPassword) {
+    return await bcrypt.compare(plainPassword, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
