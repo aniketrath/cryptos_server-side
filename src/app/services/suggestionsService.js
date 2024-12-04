@@ -1,40 +1,48 @@
 const CoinStat = require('../models/CoinStats');
+const calculatePercentageChange = require('../utils/percentageChange');
 
 /**
- * Fetches 50 random entries from the CoinStat collection,
- * calculates percentage change using the `price` field in the last two entries of the ticker_history.
- * 
- * @returns {Array} Array of coin objects with an additional `percent_change` parameter.
+ * Service to fetch 50 random entries from the CoinStat collection
+ * and calculate the percentage change between the latest two ticker_history objects.
+ *
+ * @returns {Promise<Array>} An array of coin objects with all params from the database
+ *                           and an additional 'percent_change' param.
  */
-
 const getSuggestions = async () => {
-    try {
-        // Fetch 50 random entries from the collection
-        const randomCoins = await CoinStat.aggregate([{ $sample: { size: 5 } }]);
+  try {
+    // Fetch 50 random coins from the database
+    const randomCoins = await CoinStat.aggregate([{ $sample: { size: 5 } }]);
 
-        // Map over the coins to calculate percent_change
-        const coinsWithChange = randomCoins.map((coin) => {
-            if (!coin.ticker_history || coin.ticker_history.length < 2) {
-                throw new Error(`Insufficient ticker history for coin: ${coin.id}`);
-            }
-            const latest = coin.ticker_history[coin.ticker_history.length - 1];
-            const previous = coin.ticker_history[coin.ticker_history.length - 2];
-            // Ensure the price fields exist
-            if (!latest.price || !previous.price) {
-                throw new Error(`Missing price data in ticker history for coin: ${coin.id}`);
-            }
-            // Calculate percentage change
-            const percentChange = ((latest.price - previous.price) / previous.price) * 100;
-            // Return the coin data with an added percent_change field
-            return { ...coin, percent_change: percentChange.toFixed(2) };
-        });
-        return coinsWithChange;
-    } catch (error) {
-        console.error('Error in getSuggestions:', error);
-        throw new Error('Failed to fetch and process suggestions');
-    }
+    // Process each coin to calculate percentage change
+    const coinsWithChange = randomCoins.map((coin) => {
+      // Ensure the coin has at least two ticker history entries
+      if (!coin.ticker_history || coin.ticker_history.length < 2) {
+        throw new Error(`Insufficient ticker history for coin: ${coin.id}`);
+      }
+
+      // Extract the latest and second latest ticker history objects
+      const latest = coin.ticker_history[coin.ticker_history.length - 1];
+      const previous = coin.ticker_history[coin.ticker_history.length - 2];
+
+      // Ensure both objects have a valid price property
+      if (typeof latest.price !== 'number' || typeof previous.price !== 'number') {
+        throw new Error(`Missing or invalid price data in ticker history for coin: ${coin.id}`);
+      }
+
+      // Calculate percentage change using the utility function
+      const percentChange = calculatePercentageChange(latest.price, previous.price);
+
+      // Return the coin object with an additional 'percent_change' property
+      return { ...coin, percent_change: percentChange };
+    });
+
+    return coinsWithChange;
+  } catch (error) {
+    console.error('Error in getSuggestions:', error);
+    throw new Error('Failed to fetch and process suggestions');
+  }
 };
 
 module.exports = {
-    getSuggestions,
+  getSuggestions,
 };
