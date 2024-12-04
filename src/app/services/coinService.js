@@ -1,9 +1,12 @@
 const axios = require('axios');
 const Coin = require('../models/Coin');
+require('dotenv').config();
+
+const FOREIGN_API = process.env.FOREIGN_API;
 
 const getCoinsData = async () => {
   try {
-    const response = await axios.get('https://api.coinpaprika.com/v1/coins');
+    const response = await axios.get(`${FOREIGN_API}/coins`);
     const coinData = response.data;
 
     // Filter out coins with rank 0 and sort by rank

@@ -1,12 +1,15 @@
 // services/globalStatsService.js
 const axios = require('axios');
 const GlobalCoinStats = require('../models/GlobalData'); // Adjust path as needed
+require('dotenv').config();
+
+const FOREIGN_API = process.env.FOREIGN_API;
 
 // Function to fetch data from the global endpoint and return the processed result
 const fetchGlobalStatsData = async () => {
   try {
     // Fetch data from the global endpoint
-    const response = await axios.get('https://api.coinpaprika.com/v1/global');
+    const response = await axios.get(`${FOREIGN_API}/global`);
     const globalData = response.data;
 
     // Return the data in the required format

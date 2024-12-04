@@ -1,14 +1,17 @@
 const axios = require('axios');
+require('dotenv').config();
+
+const FOREIGN_API = process.env.FOREIGN_API;
 
 // Fetch detailed data for a coin by its id
 const fetchCoinDetailsAndStats = async (id) => {
   try {
     // Fetch OHLCV data for today
-    const ohlcvResponse = await axios.get(`https://api.coinpaprika.com/v1/coins/${id}/ohlcv/today`);
+    const ohlcvResponse = await axios.get(`${FOREIGN_API}/ohlcv/today`);
     const ohlcvData = ohlcvResponse.data[0];
 
     // Fetch main coin details
-    const coinResponse = await axios.get(`https://api.coinpaprika.com/v1/coins/${id}`);
+    const coinResponse = await axios.get(`${FOREIGN_API}/coins/${id}`);
     const coinData = coinResponse.data;
 
     // Fetch historical ticker data for the last 90 days
@@ -16,7 +19,7 @@ const fetchCoinDetailsAndStats = async (id) => {
     startDate.setDate(startDate.getDate() - 90);
     const formattedStartDate = startDate.toISOString().split('T')[0];
     console.log(formattedStartDate)
-    const tickerResponse = await axios.get(`https://api.coinpaprika.com/v1/tickers/${id}/historical?start=${formattedStartDate}&interval=1d`);
+    const tickerResponse = await axios.get(`${FOREIGN_API}/tickers/${id}/historical?start=${formattedStartDate}&interval=1d`);
     const tickerHistory = tickerResponse.data;
 
     return {
