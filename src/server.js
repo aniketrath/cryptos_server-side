@@ -1,13 +1,12 @@
-// Initialize environment variables from .env file
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const dotenv = require('dotenv');
 // Import the database connection function
 const connectDB = require('./config/database');
 //Import Routes :
 const updateDatabase = require('./app/routes/updateRoutes');
-const databaseRoutes = require('./app/routes/databaseRoutes')
+const databaseRoutes = require('./app/routes/databaseRoutes');
+const authRoutes = require('./app/routes/authRoutes')
+const authenticateJWT = require('./middlewares/authMiddleware');
 
 // Initialize Express app @6000 by env
 const app = express();
@@ -18,7 +17,9 @@ connectDB();
 
 
 // Calling Imported Routes with Prefixes :
-app.use('/update', updateDatabase);
+// Use the authentication routes
+app.use('/auth', authRoutes);
+app.use('/update',authenticateJWT, updateDatabase);
 app.use('/app',databaseRoutes);
 
 
