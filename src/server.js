@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 //Import Routes :
 const updateDatabase = require('./app/routes/updateRoutes');
-const { log } = require('console');
+const databaseRoutes = require('./app/routes/databaseRoutes')
 
 // Initialize Express app @6000 by env
 const app = express();
@@ -19,6 +19,7 @@ connectDB();
 
 // Calling Imported Routes with Prefixes :
 app.use('/update', updateDatabase);
+app.use('/app',databaseRoutes);
 
 
 
