@@ -36,6 +36,9 @@ const coinSchema = new mongoose.Schema({
         enum: ["coin", "token"], // You can adjust this enum based on expected values
         required: true,
     },
+    change_24hr: {
+        type: String,
+    },
     ticker_history: [
         {
             timestamp: {
