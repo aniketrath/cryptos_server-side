@@ -1,0 +1,33 @@
+services:
+  mongo:
+    image: mongo:latest  # Official MongoDB image
+    container_name: database-mongo
+    networks:
+      - internal-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=server@cryptos
+      - MONGO_INITDB_ROOT_PASSWORD=cryptos@pegasus6
+      - MONGO_INITDB_DATABASE=cryptos_db  # Optional: a database name for your app
+    volumes:
+      - mongo-data:/data/db  # Persistent MongoDB data storage
+
+  express:
+    build: .
+    container_name: express-backend
+    networks:
+      - internal-network
+    ports:
+      - "6000:6000"  # Expose the Express app on port 3000
+    depends_on:
+      - mongo  # Ensure MongoDB starts before Express
+    environment:
+      - MONGO_APP_URI=mongodb://server%40cryptos:cryptos%40pegasus6@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
+      - PORT=6000
+      - FOREIGN_API=https://api.coinpaprika.com/v1
+      - JWT_SECRET_KEY=aniket@cryptos
+networks:
+  internal-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

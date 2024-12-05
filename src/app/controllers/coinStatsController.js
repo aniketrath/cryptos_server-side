@@ -25,7 +25,7 @@ const updateCoinStats = async (req, res) => {
           ],
         },
       },
-      { $sample: { size: 10 } }, // Randomly select 15 coins
+      { $sample: { size: 15 } }, // Randomly select 15 coins
       { $project: { id: 1, _id: 0 } }, // Include only the `id` field
     ]);
 
