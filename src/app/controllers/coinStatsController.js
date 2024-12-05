@@ -4,25 +4,19 @@ const Coin = require('../models/Coin'); // Original coins collection
 
 const updateCoinStats = async (req, res) => {
   try {
-    // Define the cutoff time (4 hours ago)
-    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
-
     // Fetch 15 random unique IDs not updated in the last 4 hours
     const ids = await Coin.aggregate([
       {
         $lookup: {
           from: "coinstats", // CoinStat collection
-          localField: "id",
-          foreignField: "id",
-          as: "stats",
+          localField: "id",   // Field in Coin collection
+          foreignField: "id", // Field in CoinStat collection
+          as: "stats",        // Resulting array will be named "stats"
         },
       },
       {
         $match: {
-          $or: [
-            { "stats.updatedAt": { $exists: false } }, // No stats exist
-            { "stats.updatedAt": { $lt: fourHoursAgo } }, // Not updated in the last 4 hours
-          ],
+          "stats": { $size: 0 }, // No matching records in the CoinStats collection
         },
       },
       { $sample: { size: 15 } }, // Randomly select 15 coins
