@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Coin = require('../models/Coin');
+const CoinStat = require('../models/CoinStats');
 require('dotenv').config();
 
 const FOREIGN_API = process.env.FOREIGN_API;
@@ -35,8 +36,10 @@ const insertCoins = async (coins) => {
   try {
     // Drop the collection before inserting new data
     await Coin.collection.drop();
-    console.log('Collection dropped successfully');
-
+    console.log('Coin List Collection dropped successfully');
+    await CoinStat.collection.drop();
+    console.log('Coin Stats Collection dropped successfully');
+    console.log("Welcome to a new Day .Now start working with Fresh Data 🤣")
     // Insert new coins
     await Coin.insertMany(coins);
     console.log('Coins inserted successfully');
