@@ -7,7 +7,7 @@ const FOREIGN_API = process.env.FOREIGN_API;
 const fetchCoinDetailsAndStats = async (id) => {
   try {
     // Fetch OHLCV data for today
-    const ohlcvResponse = await axios.get(`${FOREIGN_API}/ohlcv/today`);
+    const ohlcvResponse = await axios.get(`${FOREIGN_API}/coins/${id}/ohlcv/today`);
     const ohlcvData = ohlcvResponse.data[0];
 
     // Fetch main coin details

@@ -11,6 +11,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+},
+{
+  timestamps: true, // Adds createdAt and updatedAt fields
 });
 
 // Pre-save hook to hash password before saving it to the DB

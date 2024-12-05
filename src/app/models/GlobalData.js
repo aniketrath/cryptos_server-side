@@ -50,6 +50,9 @@ const globalCoinStatsSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,  // Automatically set creation date
     },
+},
+{
+  timestamps: true, // Adds createdAt and updatedAt fields
 });
 
 // Create and export the GlobalCoinStats model

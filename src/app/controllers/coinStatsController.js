@@ -4,15 +4,42 @@ const Coin = require('../models/Coin'); // Original coins collection
 
 const updateCoinStats = async (req, res) => {
   try {
-    // Fetch all unique ids from the `coins` collection
-    const ids = await Coin.distinct('id');
+    // Define the cutoff time (4 hours ago)
+    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
+
+    // Fetch 15 random unique IDs not updated in the last 4 hours
+    const ids = await Coin.aggregate([
+      {
+        $lookup: {
+          from: "coinstats", // CoinStat collection
+          localField: "id",
+          foreignField: "id",
+          as: "stats",
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { "stats.updatedAt": { $exists: false } }, // No stats exist
+            { "stats.updatedAt": { $lt: fourHoursAgo } }, // Not updated in the last 4 hours
+          ],
+        },
+      },
+      { $sample: { size: 10 } }, // Randomly select 15 coins
+      { $project: { id: 1, _id: 0 } }, // Include only the `id` field
+    ]);
+
+    // If no coins are found, respond with a message
     if (ids.length === 0) {
-      return res.status(404).json({ message: 'No coin IDs found in the database.' });
+      return res.status(200).json({ message: 'No coins need updating.' });
     }
-    // Loop through each id and fetch its details and stats
-    for (const id of ids) {
-      const coinData = await fetchCoinDetailsAndStats(id); // Fetch data from APIs
-      await CoinStat.findOneAndUpdate({ id: coinData.id }, coinData, { upsert: true }); // Upsert the data into CoinStat collection
+
+    // Loop through each ID and fetch its details and stats
+    for (const { id } of ids) {
+      const coinData = await fetchCoinDetailsAndStats(id); // Fetch data from external API
+
+      // Upsert (update or insert) the data into CoinStat collection
+      await CoinStat.findOneAndUpdate({ id: coinData.id }, coinData, { upsert: true, new: true });
     }
 
     res.status(200).json({ message: 'Coin stats updated successfully!' });

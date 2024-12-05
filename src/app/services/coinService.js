@@ -15,7 +15,7 @@ const getCoinsData = async () => {
       .sort((a, b) => a.rank - b.rank); // Sort by rank in ascending order
 
     // Map the filtered and sorted coins to the Coin model format
-    const coinsToInsert = filteredAndSortedCoins.slice(0, 10).map(coin => ({
+    const coinsToInsert = filteredAndSortedCoins.slice(0, 1000).map(coin => ({
       id: coin.id,
       name: coin.name,
       symbol: coin.symbol,
