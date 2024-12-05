@@ -5,9 +5,9 @@ services:
     networks:
       - internal-network
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=server@cryptos
-      - MONGO_INITDB_ROOT_PASSWORD=cryptos@pegasus6
-      - MONGO_INITDB_DATABASE=cryptos_db  # Optional: a database name for your app
+      - MONGO_INITDB_ROOT_USERNAME=username
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=cryptos_db  
     volumes:
       - mongo-data:/data/db  # Persistent MongoDB data storage
 
@@ -16,17 +16,43 @@ services:
     container_name: express-backend
     networks:
       - internal-network
+      - monitoring-network  
     ports:
-      - "6000:6000"  # Expose the Express app on port 3000
+      - "6000:6000"  # Expose the Express app on port 6000
     depends_on:
       - mongo  # Ensure MongoDB starts before Express
     environment:
-      - MONGO_APP_URI=mongodb://server%40cryptos:cryptos%40pegasus6@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
+      - MONGO_APP_URI=mongodb://username:password@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
       - PORT=6000
       - FOREIGN_API=https://api.coinpaprika.com/v1
-      - JWT_SECRET_KEY=aniket@cryptos
+      - JWT_SECRET_KEY=secretHere
+    expose:
+      - "6000"  # Expose 3000 for Prometheus scraping
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount custom Prometheus config
+    ports:
+      - "6002:9090"  # Expose Prometheus on port 6002
+    networks:
+      - monitoring-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "passwordHere"  # Set Grafana admin password
+    ports:
+      - "6001:3000"  # Expose Grafana on port 6001
+    networks:
+      - monitoring-network
+
 networks:
   internal-network:
+    driver: bridge
+  monitoring-network:
     driver: bridge
 
 volumes:
