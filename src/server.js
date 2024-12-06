@@ -3,6 +3,7 @@ const express = require('express');
 const client = require('prom-client'); // Import prom-client for Prometheus
 // Import the database connection function
 const connectDB = require('./config/database');
+const log = require('./app/utils/logger')
 // Import Routes :
 const updateDatabase = require('./app/routes/updateRoutes');
 const databaseRoutes = require('./app/routes/databaseRoutes');
@@ -45,8 +46,8 @@ app.get('/', (req, res) => {
   // Get the IP address of the user
   const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
   // Log the access with IP
-  console.log(`[${new Date().toISOString()}] Server is accessed from IP: ${userIP}`);
-  res.send(`[${new Date().toISOString()}] Server is accessed from IP: ${userIP}`);
+  log('[SUCCESS]', `Server is being accessed from IP: ${userIP}`);
+  res.send(`[${new Date().toISOString()}] Server is being accessed from IP: ${userIP}`);
 });
 
 

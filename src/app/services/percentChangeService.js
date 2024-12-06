@@ -1,7 +1,8 @@
 const CoinStat = require('../models/CoinStats');
-
+const log = require('../utils/logger')
 // Helper function to calculate percent change
 const calculatePercentChange = (oldPrice, newPrice) => {
+  log('[SUCCESS]',`Calculating Percent Change 😁`);
   if (!oldPrice || !newPrice) return 0;
   return ((newPrice - oldPrice) / oldPrice) * 100;
 };
@@ -11,7 +12,6 @@ const updatePercentChange = async () => {
   try {
     // Fetch all coins from the CoinStat collection
     const coins = await CoinStat.find();
-
     // Loop through each coin and calculate percent change
     for (const coin of coins) {
       const tickerHistory = coin.ticker_history;
@@ -30,11 +30,12 @@ const updatePercentChange = async () => {
           { new: true }
         );
       }
+      log('[SUCCESS]',`Calculation and Updation Ready 😁`);
     }
 
-    console.log('Percent change updated for all coins!');
+    log('[SUCCESS]',`Calculating Insertion/Updation Sucessfull 😁`);
   } catch (error) {
-    console.error('Error updating percent change:', error.message);
+    log('[FAILURE]',`Error updating percent change 😒 : ${error}`);
     throw new Error('Error updating percent change');
   }
 };

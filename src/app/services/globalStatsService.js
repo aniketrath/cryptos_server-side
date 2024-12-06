@@ -1,6 +1,7 @@
 // services/globalStatsService.js
 const axios = require('axios');
 const GlobalCoinStats = require('../models/GlobalData'); // Adjust path as needed
+const log = require('../utils/logger')
 require('dotenv').config();
 
 const FOREIGN_API = process.env.FOREIGN_API;
@@ -11,7 +12,7 @@ const fetchGlobalStatsData = async () => {
     // Fetch data from the global endpoint
     const response = await axios.get(`${FOREIGN_API}/global`);
     const globalData = response.data;
-
+    log('[SUCCESS]',`Fetched Global Data from Foreign Api Sucessfully 😁`);
     // Return the data in the required format
     return {
       market_cap_usd: globalData.market_cap_usd,
@@ -27,7 +28,7 @@ const fetchGlobalStatsData = async () => {
       last_updated: globalData.last_updated,
     };
   } catch (error) {
-    console.error("Error fetching global data:", error);
+    log('[FAILURE]',`Error to Fetch Global Data from Foreign Api 😒 : ${error}`);
     throw new Error("Error fetching global data", error);
   }
 };
@@ -40,9 +41,9 @@ const saveGlobalStats = async (globalStats) => {
 
     const newGlobalStats = new GlobalCoinStats(globalStats);
     await newGlobalStats.save();
-    console.log("Global data saved successfully.");
+    log('[SUCCESS]',`Global Data Saved to Db 😁`);
   } catch (error) {
-    console.error("Error saving global data:", error);
+    log('[FAILURE]',`Error saving global data 😒 : ${error}`);
     throw new Error("Error saving global data");
   }
 };
