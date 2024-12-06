@@ -22,6 +22,7 @@ services:
     depends_on:
       - mongo  # Ensure MongoDB starts before Express
     environment:
+      - FORCE_COLOR=1
       - MONGO_APP_URI=mongodb://server%40cryptos:cryptos%40pegasus6@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
       - PORT=6000
       - FOREIGN_API=https://api.coinpaprika.com/v1

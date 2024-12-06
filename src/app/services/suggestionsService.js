@@ -1,5 +1,5 @@
 const CoinStat = require('../models/CoinStats');
-
+const log = require('../utils/logger')
 /**
  * Service to fetch 5 random entries from the CoinStat collection
  * and return the data including the 'percent_change' stored in the database.
@@ -12,9 +12,10 @@ const getSuggestions = async () => {
     // Fetch 5 random coins from the database
     const randomCoins = await CoinStat.aggregate([{ $sample: { size: 5 } }]);
     // Return the fetched coins, which will include all parameters from the database including percent_change
+    log('[SUCCESS]',`Sending Suggestions [Sorted] 😁`);
     return randomCoins;
   } catch (error) {
-    console.error('Error in getSuggestions:', error);
+    log('[FAILURE]',`Error in getSuggestions 😒 : ${error}`);
     throw new Error('Failed to fetch and process suggestions');
   }
 };

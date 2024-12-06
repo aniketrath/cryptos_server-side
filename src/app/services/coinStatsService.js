@@ -1,4 +1,5 @@
 const axios = require('axios');
+const log = require('../utils/logger')
 require('dotenv').config();
 
 const FOREIGN_API = process.env.FOREIGN_API;
@@ -9,18 +10,18 @@ const fetchCoinDetailsAndStats = async (id) => {
     // Fetch OHLCV data for today
     const ohlcvResponse = await axios.get(`${FOREIGN_API}/coins/${id}/ohlcv/today`);
     const ohlcvData = ohlcvResponse.data[0];
-    console.log(`${id} > OHLCV Data Retrieved Successfully`)
+    log('[SUCCESS]',`${id} > OHLCV Data Retrieved Successfully 😁`);
     // Fetch main coin details
     const coinResponse = await axios.get(`${FOREIGN_API}/coins/${id}`);
     const coinData = coinResponse.data;
-    console.log(`${id} > Coin Data Retrieved Successfully`)
+    log('[SUCCESS]',`${id} > Coin Data Retrieved Successfully 😁`);
     // Fetch historical ticker data for the last 90 days
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 90);
     const formattedStartDate = startDate.toISOString().split('T')[0]; 
     const tickerResponse = await axios.get(`${FOREIGN_API}/tickers/${id}/historical?start=${formattedStartDate}&interval=1d`);
     const tickerHistory = tickerResponse.data;
-    console.log(`${id} > Coin Ticker Data Retrieved Successfully from Starting Date as : ${formattedStartDate} `) 
+    log('[SUCCESS]',`${id} > Coin Ticker Data Retrieved Successfully from Starting Date as : ${formattedStartDate} 😁`);
 
     return {
       id: coinData.id,
@@ -44,7 +45,7 @@ const fetchCoinDetailsAndStats = async (id) => {
       })),
     };
   } catch (error) {
-    console.error(`Error fetching details for coin ${id}:`, error);
+    log('[FAILURE]',`Error fetching or processing coin data > ${id} 😒 : ${error}`);
     throw new Error(`Error fetching details for coin ${id}`);
   }
 };
