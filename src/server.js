@@ -3,7 +3,8 @@ const express = require('express');
 const client = require('prom-client'); // Import prom-client for Prometheus
 // Import the database connection function
 const connectDB = require('./config/database');
-const log = require('./app/utils/logger')
+const log = require('./app/utils/logger');
+const os = require('os');
 // Import Routes :
 const updateDatabase = require('./app/routes/updateRoutes');
 const databaseRoutes = require('./app/routes/databaseRoutes');
@@ -21,18 +22,82 @@ const httpRequestsTotal = new client.Counter({
   help: 'Total HTTP requests',
   labelNames: ['method', 'route', 'status']
 });
+const responseTimeHistogram = new client.Histogram({
+  name: 'http_response_time_seconds',
+  help: 'HTTP response time in seconds',
+  labelNames: ['method', 'route', 'status']
+});
+// System-level metrics
+const systemMetrics = {
+  cpuUsageGauge: new client.Gauge({
+    name: 'system_cpu_usage_percentage',
+    help: 'CPU usage as a percentage',
+  }),
+  memoryUsageGauge: new client.Gauge({
+    name: 'system_memory_usage_percentage',
+    help: 'Memory usage as a percentage',
+  }),
+  diskUsageGauge: new client.Gauge({
+    name: 'system_disk_usage_percentage',
+    help: 'Disk usage as a percentage',
+  }),
+};
+
+// Function to collect system metrics
+const collectSystemMetrics = () => {
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
+  const usedMemory = totalMemory - freeMemory;
+  const memoryUsagePercentage = (usedMemory / totalMemory) * 100;
+
+  // Simulate CPU usage
+  const cpuUsagePercentage = os.loadavg()[0] * 100 / os.cpus().length;
+
+  // Placeholder for disk usage
+  const diskUsagePercentage = Math.random() * 100; // Simulated
+
+  // Update gauges
+  systemMetrics.cpuUsageGauge.set(cpuUsagePercentage);
+  systemMetrics.memoryUsageGauge.set(memoryUsagePercentage);
+  systemMetrics.diskUsageGauge.set(diskUsagePercentage);
+};
+
+// Collect system metrics every 5 seconds
+setInterval(collectSystemMetrics, 5000);
+
+// Register metrics
 register.registerMetric(httpRequestsTotal);
+register.registerMetric(responseTimeHistogram);
+// Register the system metrics
+register.registerMetric(systemMetrics.cpuUsageGauge);
+register.registerMetric(systemMetrics.memoryUsageGauge);
+register.registerMetric(systemMetrics.diskUsageGauge);
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 connectDB();
 
 // Log and count requests for Prometheus
+
 app.use((req, res, next) => {
+  const start = process.hrtime();
+
   res.on('finish', () => {
-    // Increment the counter for each request, using method, route, and status
-    httpRequestsTotal.inc({ method: req.method, route: req.route?.path || 'unknown', status: res.statusCode });
+    const durationInSeconds = process.hrtime(start)[0] + process.hrtime(start)[1] / 1e9;
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.route?.path || 'unknown',
+      status: res.statusCode,
+    });
+
+    responseTimeHistogram.observe({
+      method: req.method,
+      route: req.route?.path || 'unknown',
+      status: res.statusCode,
+    }, durationInSeconds);
   });
+
   next();
 });
 

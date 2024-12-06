@@ -57,7 +57,7 @@ services:
     networks:
       - monitoring-network
     volumes:
-      - service-logger:/var/tmp/
+      - service-logger:/var/lib/grafana
 
   scheduler:
     build: ./scheduler  # Path to your scheduler directory with Dockerfile
