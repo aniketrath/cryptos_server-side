@@ -68,9 +68,10 @@ services:
       express:
         condition: service_healthy  # Wait for Express to be healthy
     environment:
+      - FORCE_COLOR=1
       - SERVER_URL=http://express-backend:6000  # Express server URL
-      - USERNAME=aniketrath  # Add your username for login
-      - PASSWD=pegasus6  # Add your password for login
+      - USERNAME=${EXPRESS_ACCESS_USENAME}  # Add your username for login
+      - PASSWD=${EXPRESS_ACCESS_PASSWD}  # Add your password for login
 
 networks:
   internal-network:
