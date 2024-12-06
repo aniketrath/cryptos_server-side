@@ -41,11 +41,14 @@ app.use('/auth', authRoutes);
 app.use('/update', authenticateJWT, updateDatabase);
 app.use('/app', databaseRoutes);
 
-// Default route to check if the server is working
 app.get('/', (req, res) => {
-  console.log("Server is Accessed");
-  res.send('Server is running');
+  // Get the IP address of the user
+  const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+  // Log the access with IP
+  console.log(`[${new Date().toISOString()}] Server is accessed from IP: ${userIP}`);
+  res.send(`[${new Date().toISOString()}] Server is accessed from IP: ${userIP}`);
 });
+
 
 // Expose the /metrics endpoint for Prometheus to scrape
 app.get('/metrics', async (req, res) => {
