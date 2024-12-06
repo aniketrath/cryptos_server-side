@@ -76,3 +76,4 @@ networks:
 
 volumes:
   mongo-data:
+    external: true
