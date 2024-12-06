@@ -1,0 +1,14 @@
+positions:
+  filename: /var/tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: "express"  # Custom job name for this scrape configuration
+    static_configs:
+      - targets:
+          - localhost  # Name of the Express container or network alias
+        labels:
+          job: express  # Label for the logs
+          __path__: /var/tmp/cryptos/*.log  # Path to log files inside the container

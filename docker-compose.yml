@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:latest  # Official MongoDB image
+    image: mongo:latest
     container_name: database-mongo
     networks:
       - internal-network
@@ -9,7 +9,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_APP_PASSWD}
       - MONGO_INITDB_DATABASE=${MONGO_APP_DB}
     volumes:
-      - mongo-data:/data/db  # Persistent MongoDB data storage
+      - mongo-data:/data/db
 
   express:
     build: .
@@ -18,9 +18,10 @@ services:
       - internal-network
       - monitoring-network
     ports:
-      - "6000:6000"  # Expose the Express app on port 6000
+      - "6000:6000"
     depends_on:
-      - mongo  # Ensure MongoDB starts before Express
+      - mongo
+      - loki  # Ensure Loki is available before Express starts
     environment:
       - FORCE_COLOR=1
       - MONGO_APP_URI=${MONGO_APP_URI}
@@ -28,22 +29,22 @@ services:
       - FOREIGN_API=${FOREIGN_API}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     expose:
-      - "6000"  # Expose 6000 for Prometheus scraping
+      - "6000"
     volumes:
-      - service-logger:/var/tmp/
+      - service-logger:/var/tmp/cryptos
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6000/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount custom Prometheus config
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "6002:9090"  # Expose Prometheus on port 6002
+      - "6002:9090"
     networks:
       - monitoring-network
 
@@ -51,27 +52,56 @@ services:
     image: grafana/grafana
     container_name: grafana
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_APP_PASSED}  # Set Grafana admin password
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_APP_PASSED}
     ports:
-      - "6001:3000"  # Expose Grafana on port 6001
+      - "6001:3000"
     networks:
       - monitoring-network
     volumes:
-      - service-logger:/var/tmp/
+      - service-logger:/var/lib/grafana
+    depends_on:
+      - loki  # Ensure Loki is available for Grafana to read logs
+
+  loki:
+    image: grafana/loki  # Build the custom Loki image
+    container_name: loki
+    ports:
+      - "6003:3100"
+    volumes:
+      - service-logger:/loki
+      - ./configs/loki-config.yml:/etc/loki/config.yml
+    command: -config.file=/etc/loki/config.yml
+    networks:
+      - monitoring-network
+    expose:
+      - 3100
+
+  promtail:
+    image: grafana/promtail:2.7.1
+    container_name: promtail
+    environment:
+      - LOKI_URL=http://loki:3100/api/v1/push
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - service-logger:/var/tmp/ 
+      - service-logger:/var/tmp/cryptos
+      - ./configs/promtail-config.yml:/etc/promtail/config.yml
+    networks:
+      - monitoring-network
 
   scheduler:
-    build: ./scheduler  # Path to your scheduler directory with Dockerfile
+    build: ./scheduler
     container_name: scheduler
     networks:
       - monitoring-network
     depends_on:
       express:
-        condition: service_healthy  # Wait for Express to be healthy
+        condition: service_healthy
     environment:
       - FORCE_COLOR=1
-      - SERVER_URL=http://express-backend:6000  # Express server URL
-      - USERNAME=${EXPRESS_ACCESS_USENAME}  # Add your username for login
-      - PASSWD=${EXPRESS_ACCESS_PASSWD}  # Add your password for login
+      - SERVER_URL=http://express-backend:6000
+      - USERNAME=${EXPRESS_ACCESS_USENAME}
+      - PASSWD=${EXPRESS_ACCESS_PASSWD}
 
 networks:
   internal-network:
