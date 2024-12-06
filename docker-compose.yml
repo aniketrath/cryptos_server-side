@@ -29,6 +29,8 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     expose:
       - "6000"  # Expose 6000 for Prometheus scraping
+    volumes:
+      - service-logger:/var/tmp/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6000/"]
       interval: 10s
@@ -54,6 +56,8 @@ services:
       - "6001:3000"  # Expose Grafana on port 6001
     networks:
       - monitoring-network
+    volumes:
+      - service-logger:/var/tmp/
 
   scheduler:
     build: ./scheduler  # Path to your scheduler directory with Dockerfile
@@ -76,4 +80,6 @@ networks:
 
 volumes:
   mongo-data:
+    external: true
+  service-logger:
     external: true
