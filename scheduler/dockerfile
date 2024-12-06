@@ -1,0 +1,5 @@
+FROM node:22.11
+WORKDIR /usr/src/scheduler
+COPY . .
+RUN npm i
+CMD ["npm","run","start"]

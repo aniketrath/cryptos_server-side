@@ -5,9 +5,9 @@ services:
     networks:
       - internal-network
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=username
-      - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=cryptos_db  
+      - MONGO_INITDB_ROOT_USERNAME=server@cryptos
+      - MONGO_INITDB_ROOT_PASSWORD=cryptos@pegasus6
+      - MONGO_INITDB_DATABASE=cryptos_db
     volumes:
       - mongo-data:/data/db  # Persistent MongoDB data storage
 
@@ -16,18 +16,23 @@ services:
     container_name: express-backend
     networks:
       - internal-network
-      - monitoring-network  
+      - monitoring-network
     ports:
       - "6000:6000"  # Expose the Express app on port 6000
     depends_on:
       - mongo  # Ensure MongoDB starts before Express
     environment:
-      - MONGO_APP_URI=mongodb://username:password@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
+      - MONGO_APP_URI=mongodb://server%40cryptos:cryptos%40pegasus6@database-mongo:27017/cryptos_db?authSource=admin  # MongoDB URI with authentication
       - PORT=6000
       - FOREIGN_API=https://api.coinpaprika.com/v1
-      - JWT_SECRET_KEY=secretHere
+      - JWT_SECRET_KEY=aniket@cryptos
     expose:
-      - "6000"  # Expose 3000 for Prometheus scraping
+      - "6000"  # Expose 6000 for Prometheus scraping
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   prometheus:
     image: prom/prometheus
@@ -48,6 +53,19 @@ services:
       - "6001:3000"  # Expose Grafana on port 6001
     networks:
       - monitoring-network
+
+  scheduler:
+    build: ./scheduler  # Path to your scheduler directory with Dockerfile
+    container_name: scheduler
+    networks:
+      - monitoring-network
+    depends_on:
+      express:
+        condition: service_healthy  # Wait for Express to be healthy
+    environment:
+      - SERVER_URL=http://express-backend:6000  # Express server URL
+      - USERNAME=aniketrath  # Add your username for login
+      - PASSWD=pegasus6  # Add your password for login
 
 networks:
   internal-network:
