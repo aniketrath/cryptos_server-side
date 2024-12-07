@@ -10,18 +10,18 @@ const fetchCoinDetailsAndStats = async (id) => {
     // Fetch OHLCV data for today
     const ohlcvResponse = await axios.get(`${FOREIGN_API}/coins/${id}/ohlcv/today`);
     const ohlcvData = ohlcvResponse.data[0];
-    log('[SUCCESS]',`${id} > OHLCV Data Retrieved Successfully 😁`);
+    log('[SUCCESS]',`${id} > OHLCV Data Retrieved Successfully`);
     // Fetch main coin details
     const coinResponse = await axios.get(`${FOREIGN_API}/coins/${id}`);
     const coinData = coinResponse.data;
-    log('[SUCCESS]',`${id} > Coin Data Retrieved Successfully 😁`);
+    log('[SUCCESS]',`${id} > Coin Data Retrieved Successfully`);
     // Fetch historical ticker data for the last 90 days
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 90);
     const formattedStartDate = startDate.toISOString().split('T')[0]; 
     const tickerResponse = await axios.get(`${FOREIGN_API}/tickers/${id}/historical?start=${formattedStartDate}&interval=1d`);
     const tickerHistory = tickerResponse.data;
-    log('[SUCCESS]',`${id} > Coin Ticker Data Retrieved Successfully from Starting Date as : ${formattedStartDate} 😁`);
+    log('[SUCCESS]',`${id} > Coin Ticker Data Retrieved Successfully from Starting Date as : ${formattedStartDate}`);
 
     return {
       id: coinData.id,
@@ -45,7 +45,7 @@ const fetchCoinDetailsAndStats = async (id) => {
       })),
     };
   } catch (error) {
-    log('[FAILURE]',`Error fetching or processing coin data > ${id} 😒 : ${error}`);
+    log('[FAILURE]',`Error fetching or processing coin data > ${id} : ${error}`);
     throw new Error(`Error fetching details for coin ${id}`);
   }
 };

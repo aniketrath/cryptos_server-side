@@ -10,7 +10,7 @@ const getCoinsData = async () => {
   try {
     const response = await axios.get(`${FOREIGN_API}/coins`);
     const coinData = response.data;
-    log('[SUCCESS]', `Fetching Coin Name List from Foreign API 😁`);
+    log('[SUCCESS]', `Fetching Coin Name List from Foreign API`);
     // Filter out coins with rank 0 and sort by rank
     const filteredAndSortedCoins = coinData
       .filter(coin => coin.rank !== 0)  // Exclude coins with rank 0
@@ -29,7 +29,7 @@ const getCoinsData = async () => {
 
     return coinsToInsert;
   } catch (error) {
-    log('[FAILURE]', `Error fetching or processing coin data 😒 : ${error.message}`);
+    log('[FAILURE]', `Error fetching or processing coin data: ${error.message}`);
     throw new Error('Error fetching or processing coin data: ' + error.message);
   }
 };
@@ -38,21 +38,21 @@ const insertCoins = async (coins) => {
   try {
     // Drop the collection before inserting new data
     await Coin.collection.drop();
-    log('[SUCCESS]', `Coin List Collection dropped successfully 😁`);
+    log('[SUCCESS]', `Coin List Collection dropped successfully`);
     await CoinStat.collection.drop();
-    log('[SUCCESS]', `Coin Stats Collection dropped successfully 😁`);
-    log('[SUCCESS]', `Welcome to a new Day .Now start working with Fresh Data 🤣`);
+    log('[SUCCESS]', `Coin Stats Collection dropped successfully`);
+    log('[SUCCESS]', `Welcome to a new Day .Now start working with Fresh Data`);
     // Insert new coins
     await Coin.insertMany(coins);
-    log('[SUCCESS]', `Coin List Insertion to Db completed successfully 😁`);
+    log('[SUCCESS]', `Coin List Insertion to Db completed successfully`);
   } catch (error) {
     if (error.message === 'ns not found') {
       // This error means the collection does not exist yet, which is okay
-      log('[SUCCESS]', `Coin List Collection Generated successfully 😁`);
+      log('[SUCCESS]', `Coin List Collection Generated successfully`);
       await Coin.insertMany(coins);
-      log('[SUCCESS]', `Coin List Insertion to Db completed successfully 😁`);
+      log('[SUCCESS]', `Coin List Insertion to Db completed successfully`);
     } else {
-      log('[FAILURE]', `Coin List Insertion Failed 😒 : ${error.message}`);
+      log('[FAILURE]', `Coin List Insertion Failed : ${error.message}`);
       throw new Error('Error inserting coins into DB: ' + error.message);
     }
   }

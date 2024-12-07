@@ -18,7 +18,7 @@ const getTrendingCoins = async () => {
     log('[SUCCESS]',`Sending Trending Data [Sorted] 😁`);
     return sortedCoins;
   } catch (error) {
-    log('[FAILURE]',`Error in getTrendingCoins 😒 : ${error}`);
+    log('[FAILURE]',`Error in getTrendingCoins : ${error}`);
     throw new Error('Failed to fetch trending coins');
   }
 };

@@ -111,7 +111,7 @@ app.get('/', (req, res) => {
   // Get the IP address of the user
   const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
   // Log the access with IP
-  log('[SUCCESS]', `Server is being accessed from IP: ${userIP}`);
+  log('[INFO]', `Server is being accessed from IP: ${userIP}`);
   res.send(`[${new Date().toISOString()}] Server is being accessed from IP: ${userIP}`);
 });
 

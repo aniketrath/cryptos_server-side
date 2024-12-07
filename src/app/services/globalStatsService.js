@@ -12,7 +12,7 @@ const fetchGlobalStatsData = async () => {
     // Fetch data from the global endpoint
     const response = await axios.get(`${FOREIGN_API}/global`);
     const globalData = response.data;
-    log('[SUCCESS]',`Fetched Global Data from Foreign Api Sucessfully 😁`);
+    log('[SUCCESS]',`Fetched Global Data from Foreign Api Sucessfully`);
     // Return the data in the required format
     return {
       market_cap_usd: globalData.market_cap_usd,
@@ -28,7 +28,7 @@ const fetchGlobalStatsData = async () => {
       last_updated: globalData.last_updated,
     };
   } catch (error) {
-    log('[FAILURE]',`Error to Fetch Global Data from Foreign Api 😒 : ${error}`);
+    log('[FAILURE]',`Error to Fetch Global Data from Foreign Api : ${error}`);
     throw new Error("Error fetching global data", error);
   }
 };
