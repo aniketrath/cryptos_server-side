@@ -7,8 +7,6 @@ const connectDB = async () => {
   try {
     // Establish MongoDB connection using Mongoose
     await mongoose.connect(dbURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       socketTimeoutMS: 30000, // Set socket timeout to 30 seconds
       connectTimeoutMS: 30000, // Set connection timeout to 30 seconds
     });

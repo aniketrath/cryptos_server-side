@@ -35,8 +35,12 @@ const log = (status, msg) => {
   let statusColor;
   if (status === '[SUCCESS]') {
     statusColor = chalk.bold.green(status);
-  } else if (status === '[FAILURE]') {
+  }else if (status === '[FAILURE]') {
     statusColor = chalk.bold.red(status);
+  }else if (status === '[WARNING]') {
+    statusColor = chalk.bold.yellow(status);
+  }else if (status === '[INFO]') {
+    statusColor = chalk.bold.gray(status);
   } else {
     statusColor = status; // Fallback for unformatted status
   }

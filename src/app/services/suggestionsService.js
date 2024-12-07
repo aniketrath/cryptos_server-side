@@ -12,10 +12,10 @@ const getSuggestions = async () => {
     // Fetch 5 random coins from the database
     const randomCoins = await CoinStat.aggregate([{ $sample: { size: 5 } }]);
     // Return the fetched coins, which will include all parameters from the database including percent_change
-    log('[SUCCESS]',`Sending Suggestions [Sorted] 😁`);
+    log('[SUCCESS]',`Sending Suggestions [Sorted]`);
     return randomCoins;
   } catch (error) {
-    log('[FAILURE]',`Error in getSuggestions 😒 : ${error}`);
+    log('[FAILURE]',`Error in getSuggestions : ${error}`);
     throw new Error('Failed to fetch and process suggestions');
   }
 };
