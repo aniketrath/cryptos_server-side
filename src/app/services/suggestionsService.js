@@ -10,7 +10,7 @@ const log = require('../utils/logger')
 const getSuggestions = async () => {
   try {
     // Fetch 5 random coins from the database
-    const randomCoins = await CoinStat.aggregate([{ $sample: { size: 5 } }]);
+    const randomCoins = await CoinStat.aggregate([{ $sample: { size: 15 } }]);
     // Return the fetched coins, which will include all parameters from the database including percent_change
     log('[SUCCESS]',`Sending Suggestions [Sorted]`);
     return randomCoins;

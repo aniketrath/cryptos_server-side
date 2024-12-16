@@ -31,7 +31,7 @@ services:
     expose:
       - "6000"
     volumes:
-      - service-logger:/var/tmp/cryptos
+      - logs:/var/log/server/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6000/"]
       interval: 15s
@@ -58,7 +58,8 @@ services:
     networks:
       - monitoring-network
     volumes:
-      - service-logger:/var/lib/grafana
+      - tools:/var/lib/grafana
+    user: root
     depends_on:
       - loki  # Ensure Loki is available for Grafana to read logs
 
@@ -68,7 +69,7 @@ services:
     ports:
       - "6003:3100"
     volumes:
-      - service-logger:/loki
+      - tools:/loki
       - ./configs/loki-config.yml:/etc/loki/config.yml
     command: -config.file=/etc/loki/config.yml
     networks:
@@ -83,8 +84,9 @@ services:
       - LOKI_URL=http://loki:3100/api/v1/push
     command: -config.file=/etc/promtail/config.yml
     volumes:
-      - service-logger:/var/tmp/ 
-      - service-logger:/var/tmp/cryptos
+      - tools:/var/tmp/ 
+      - logs:/var/log/server/
+      - logs:/var/log/scheduler/
       - ./configs/promtail-config.yml:/etc/promtail/config.yml
     networks:
       - monitoring-network
@@ -94,6 +96,8 @@ services:
     container_name: scheduler
     networks:
       - monitoring-network
+    volumes:
+      - logs:/var/log/scheduler/
     depends_on:
       express:
         condition: service_healthy
@@ -112,5 +116,7 @@ networks:
 volumes:
   mongo-data:
     external: true
-  service-logger:
+  logs:
+    external: true
+  tools:
     external: true

@@ -3,7 +3,7 @@ const path = require('path');
 const chalk = require('chalk'); // For colored console output
 
 // Path to the log file
-const SCHEDULER_FILE_PATH = '/var/tmp/cryptos/scheduler.log';
+const SCHEDULER_FILE_PATH = '/var/log/scheduler/scheduler.log';
 
 // Ensure the log file and directory exist
 const ensureLogFileExists = () => {

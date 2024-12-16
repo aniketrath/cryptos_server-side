@@ -60,8 +60,9 @@ const insertCoins = async (coins) => {
   }
 };
 
+// Fetch a specific coin by ID
 const getCoinById = async (id) => {
-  log('[INFO]', `Collecting Coin Details for ${id} from Database`)
+  log('[INFO]', `Collecting Coin Details for ${id} from Database`);
   try {
     const coin = await CoinStat.findOne({ id }); // Query by the "id" field
     if (!coin) {
@@ -70,9 +71,22 @@ const getCoinById = async (id) => {
     log('[SUCCESS]', `Coin Data Retrieved successfully`);
     return coin;
   } catch (error) {
-    log('[FAILURE]', `Coin List Insertion Failed : ${error.message}`)
-    throw new Error('Error inserting coins into DB: ' + error.message);
+    log('[FAILURE]', `Coin Retrieval Failed: ${error.message}`);
+    throw new Error('Error retrieving coin from DB: ' + error.message);
   }
 };
 
-module.exports = { getCoinsData, insertCoins, getCoinById };
+// Fetch all coins
+const getAllCoins = async () => {
+  log('[INFO]', 'Collecting all Coin Details from Database');
+  try {
+    const coins = await CoinStat.find(); // Query all documents
+    log('[SUCCESS]', `Retrieved ${coins.length} coins successfully`);
+    return coins;
+  } catch (error) {
+    log('[FAILURE]', `Failed to Retrieve Coin List: ${error.message}`);
+    throw new Error('Error retrieving coin list from DB: ' + error.message);
+  }
+};
+
+module.exports = { getCoinsData, insertCoins, getCoinById , getAllCoins};

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk'); // For colored console output
 // Path to the log file
-const LOG_FILE_PATH = '/var/tmp/cryptos/backend.log';
+const LOG_FILE_PATH = '/var/log/server/backend.log';
 // Ensure the directory and file exist
 const ensureLogFileExists = () => {
   const dir = path.dirname(LOG_FILE_PATH);
