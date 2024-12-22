@@ -18,7 +18,7 @@ services:
       - internal-network
       - monitoring-network
     ports:
-      - "6000:6000"
+      - "5000:6000"
     depends_on:
       - mongo
       - loki  # Ensure Loki is available before Express starts
