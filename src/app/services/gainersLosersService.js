@@ -32,13 +32,13 @@ const getTopGainers = async () => {
 const getTopLosers = async () => {
     try {
         // Fetch all coins from the CoinStat collection
-        const coins = await CoinStat.find({ percent_change: { $lt: 0 } }); // Filter only negative percent change
+        const coins = await CoinStat.find({ change_24hr: { $lt: 0 } }); // Filter only negative percent change
         if(coins.length === 0){
             log('[SUCCESS]',`Looks like Nobody Lost`);
             return { message: 'Looks like Nobody Lost'};
         }
         // Sort coins based on the percent_change in ascending order (most negative first)
-        const sortedLosers = coins.sort((a, b) => a.percent_change - b.percent_change);
+        const sortedLosers = coins.sort((a, b) => a.change_24hr - b.change_24hr);
         return sortedLosers;
     } catch (error) {
         log('[FAILURE]',`Error in getTopLosers: ${error}`);

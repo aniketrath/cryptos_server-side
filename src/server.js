@@ -4,6 +4,7 @@ const client = require('prom-client'); // Import prom-client for Prometheus
 // Import the database connection function
 const connectDB = require('./config/database');
 const log = require('./app/utils/logger');
+const cors = require('cors');
 const os = require('os');
 // Import Routes :
 const updateDatabase = require('./app/routes/updateRoutes');
@@ -13,6 +14,7 @@ const authenticateJWT = require('./middlewares/authMiddleware');
 
 // Initialize Express app @6000 by env
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 3000;
 
 // Create a Registry and define Metrics

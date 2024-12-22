@@ -27,6 +27,9 @@ const updateCoinStats = async (req, res) => {
     if (ids.length === 0) {
       return res.status(200).json({ message: 'No coins need updating.' });
     }
+    // Append additional elements to the `ids` array
+    ids.push({ id: "btc-bitcoin" });
+    ids.push({ id: "eth-ethereum" });
 
     // Loop through each ID and fetch its details and stats
     for (const { id } of ids) {

@@ -12,3 +12,11 @@ scrape_configs:
         labels:
           job: express  # Label for the logs
           __path__: /var/tmp/cryptos/*.log  # Path to log files inside the container
+
+  - job_name: "scheduler"  # Custom job name for this scrape configuration
+    static_configs:
+      - targets:
+          - localhost  # Name of the Express container or network alias
+        labels:
+          job: scheduler  # Label for the logs
+          __path__: /var/log/scheduler/*.log  # Path to log files inside the container

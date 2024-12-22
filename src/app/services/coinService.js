@@ -8,6 +8,7 @@ const FOREIGN_API = process.env.FOREIGN_API;
 
 const getCoinsData = async () => {
   try {
+    log('[INFO]', `Collecting Coin Details from Foreign API`);
     const response = await axios.get(`${FOREIGN_API}/coins`);
     const coinData = response.data;
     log('[SUCCESS]', `Fetching Coin Name List from Foreign API`);
@@ -36,6 +37,7 @@ const getCoinsData = async () => {
 
 const insertCoins = async (coins) => {
   try {
+    log('[INFO]', `Initiation Coin Insertion.`);
     // Drop the collection before inserting new data
     await Coin.collection.drop();
     log('[SUCCESS]', `Coin List Collection dropped successfully`);
@@ -58,4 +60,33 @@ const insertCoins = async (coins) => {
   }
 };
 
-module.exports = { getCoinsData, insertCoins };
+// Fetch a specific coin by ID
+const getCoinById = async (id) => {
+  log('[INFO]', `Collecting Coin Details for ${id} from Database`);
+  try {
+    const coin = await CoinStat.findOne({ id }); // Query by the "id" field
+    if (!coin) {
+      throw new Error("Coin not found");
+    }
+    log('[SUCCESS]', `Coin Data Retrieved successfully`);
+    return coin;
+  } catch (error) {
+    log('[FAILURE]', `Coin Retrieval Failed: ${error.message}`);
+    throw new Error('Error retrieving coin from DB: ' + error.message);
+  }
+};
+
+// Fetch all coins
+const getAllCoins = async () => {
+  log('[INFO]', 'Collecting all Coin Details from Database');
+  try {
+    const coins = await CoinStat.find(); // Query all documents
+    log('[SUCCESS]', `Retrieved ${coins.length} coins successfully`);
+    return coins;
+  } catch (error) {
+    log('[FAILURE]', `Failed to Retrieve Coin List: ${error.message}`);
+    throw new Error('Error retrieving coin list from DB: ' + error.message);
+  }
+};
+
+module.exports = { getCoinsData, insertCoins, getCoinById , getAllCoins};
