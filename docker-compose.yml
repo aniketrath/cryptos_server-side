@@ -109,7 +109,7 @@ services:
       - PASSWD=${EXPRESS_ACCESS_PASSWD}
 
   frontend:
-    image: aniketrath/cryptos_client-view:835c5fe
+    image: aniketrath/cryptos_client-view:latest
     container_name: frontend-react
     depends_on:
       express:
