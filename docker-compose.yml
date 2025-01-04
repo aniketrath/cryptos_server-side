@@ -1,9 +1,20 @@
+# Services Hosted [ Exposed to Browser ]
+# 1. Express @ 5000
+# 2. Prometheus @ 5100
+# 3. Grafana @ 5200
+# 4. Loki @ 5300
+# 5. React @ 3000
+# 6. Nginx @ 80
+# Static IPs assigned to help Troubleshooting
+
 services:
   mongo:
     image: mongo:latest
     container_name: database-mongo
     networks:
-      - internal-network
+      internal-network:
+        ipv4_address: 10.0.0.1
+        ipv6_address: fd00:1000::1
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_APP_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_APP_PASSWD}
@@ -15,9 +26,15 @@ services:
     build: .
     container_name: express-backend
     networks:
-      - internal-network
-      - monitoring-network
-      - client-server
+      internal-network:
+        ipv4_address: 10.0.0.2
+        ipv6_address: fd00:1000::2
+      monitoring-network:
+        ipv4_address: 20.0.0.1
+        ipv6_address: fd00:2000::1
+      client-server:
+        ipv4_address: 30.0.0.1
+        ipv6_address: fd00:3000::1
     ports:
       - "5000:3000"
     depends_on:
@@ -47,7 +64,9 @@ services:
     ports:
       - "5100:9090"
     networks:
-      - monitoring-network
+      monitoring-network:
+        ipv4_address: 20.0.0.2
+        ipv6_address: fd00:2000::2
 
   grafana:
     image: grafana/grafana
@@ -57,7 +76,10 @@ services:
     ports:
       - "5200:3000"
     networks:
-      - monitoring-network
+      monitoring-network:
+        ipv4_address: 20.0.0.3
+        ipv6_address: fd00:2000::3
+
     volumes:
       - tools:/var/lib/grafana
     user: root
@@ -74,7 +96,9 @@ services:
       - ./configs/loki-config.yml:/etc/loki/config.yml
     command: -config.file=/etc/loki/config.yml
     networks:
-      - monitoring-network
+      monitoring-network:
+        ipv4_address: 20.0.0.4
+        ipv6_address: fd00:2000::4
     expose:
       - 3100
 
@@ -90,13 +114,17 @@ services:
       - logs:/var/log/scheduler/
       - ./configs/promtail-config.yml:/etc/promtail/config.yml
     networks:
-      - monitoring-network
+      monitoring-network:
+        ipv4_address: 20.0.0.5
+        ipv6_address: fd00:2000::5
 
   scheduler:
     build: ./scheduler
     container_name: scheduler
     networks:
-      - monitoring-network
+      monitoring-network:
+        ipv4_address: 20.0.0.6
+        ipv6_address: fd00:2000::6
     volumes:
       - logs:/var/log/scheduler/
     depends_on:
@@ -115,8 +143,12 @@ services:
       express:
         condition: service_healthy
     networks:
-      - client-server
-      - internal-network
+      client-server:
+        ipv4_address: 30.0.0.2
+        ipv6_address: fd00:3000::2
+      internal-network:
+        ipv4_address: 10.0.0.3
+        ipv6_address: fd00:1000::3
     environment:
       REACT_APP_ADMIN_PANEL: ${REACT_APP_ADMIN_PANEL}
     ports:
@@ -128,8 +160,12 @@ services:
     image: nginx:alpine
     container_name: nginx-proxy
     networks:
-      - client-server
-      - internal-network
+      client-server:
+        ipv4_address: 30.0.0.3
+        ipv6_address: fd00:3000::3
+      internal-network:
+        ipv4_address: 10.0.0.4
+        ipv6_address: fd00:1000::4
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
       - ./configs/default.conf:/etc/nginx/conf.d/default.conf
@@ -144,10 +180,34 @@ services:
 networks:
   internal-network:
     driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/24
+          gateway: 10.0.0.254
+        - subnet: fd00:1000::/112
+          gateway: fd00:1000::ffff
   monitoring-network:
     driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 20.0.0.0/24
+          gateway: 20.0.0.254
+        - subnet: fd00:2000::/112
+          gateway: fd00:2000::ffff
   client-server:
     driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 30.0.0.0/24
+          gateway: 30.0.0.254
+        - subnet: fd00:3000::/112
+          gateway: fd00:3000::ffff
 
 volumes:
   mongo-data:
